@@ -31,7 +31,7 @@ spec:
 # The name of the container is specified below
         - name: stedi-cayson
 # The image is a prebuilt file containing the operating system
-          image: cfantauzzi/hello-nginx:latest
+          image: gcr.io/cit262-group-project/stedi-cayson
 # The ports is a list of tcp ports the pod listens on
           ports:
 # The container port is a specific port the pod listens on
