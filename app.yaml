@@ -62,28 +62,64 @@ spec:
             initialDelaySeconds: 10
 # periodSeconds tells Kubernetes how often to check health
             periodSeconds: 3
+# ---
+# # apiVersion tells kubernetes which version of yaml to use
+# apiVersion: v1
+# # kind tells kubernetes what kind of object to create
+# kind: Service
+# # metadata contains attributes about the object
+# metadata:
+# # name is the name of the object we are creating
+#   name: stedi-cayson-loadbalancer
+# # spec is the specification for the object (or the loadbalancer)
+# spec:
+# # selector tells the network layer how to find the right pod
+#   selector:
+# # app tells the selector which app to send traffic to
+#     app: stedi-cayson
+# # type tells kubernetes the type of service we want
+# # a LoadBalancer distributes network packets to one or more pods
+#   type: LoadBalancer
+# # ports are a list of ports the Load Balancer listens on
+#   ports:
+# # port is the port we want to listen on the network
+#     - port: 80
+# # targetport is the port the pod listens on inside Kubernetes
+#       targetPort: 4567
 ---
-# apiVersion tells kubernetes which version of yaml to use
-apiVersion: v1
-# kind tells kubernetes what kind of object to create
-kind: Service
-# metadata contains attributes about the object
-metadata:
-# name is the name of the object we are creating
-  name: stedi-cayson-loadbalancer
-# spec is the specification for the object (or the loadbalancer)
-spec:
-# selector tells the network layer how to find the right pod
-  selector:
-# app tells the selector which app to send traffic to
-    app: stedi-cayson
-# type tells kubernetes the type of service we want
-# a LoadBalancer distributes network packets to one or more pods
-  type: LoadBalancer
-# ports are a list of ports the Load Balancer listens on
-  ports:
-# port is the port we want to listen on the network
-    - port: 80
-# targetport is the port the pod listens on inside Kubernetes
-      targetPort: 4567
+  apiVersion: networking.gke.io/v1
+  kind: ManagedCertificate
+  metadata:
+    name: stedi-certificate-cayson
+  spec:
+    domains:
+      - cayson.cit262.com
+---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: stedi-nodeport-cayson
+  spec:
+    selector:
+      app: stedi-cayson
+    type: NodePort
+    ports:
+      - port: 80
+        targetPort: 4567    
+---
+  apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    name: stedi-ingress-cayson
+    annotations:
+      kubernetes.io/ingress.global-static-ip-name: caysonip
+      networking.gke.io/managed-certificates: stedi-certificate-cayson
+      kubernetes.io/ingress.allow-http: "false"
+      kubernetes.io/ingress.class: "gce"
+  spec:
+    defaultBackend:
+      service:
+        name: stedi-nodeport-cayson
+        port:
+          number: 80
 
