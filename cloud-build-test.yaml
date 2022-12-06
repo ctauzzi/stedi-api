@@ -1,0 +1,48 @@
+#© 2022 cayson
+steps:
+  # This step stops the stedi pod
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: Stop Pod
+    args:
+      - 'scale'
+      - 'deploy'
+      - 'stedi-cayson'
+      - '--replicas=0'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-1'
+      # This step deploys the application in Kubernetes
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args:
+      - run
+      - --filename=app.yaml
+      - --image=gcr.io/$PROJECT_ID/stedi-cayson:$SHORT_SHA
+      - --location=us-central1-c
+      - --cluster=cluster-1
+
+  # This step is uppossed to run the cloud-build-api test Image 
+  # The PROJECT_ID variable is automatically
+  # replaced by Cloud Build.
+  #---------Test_stuff-----------
+  - name: 'gcr.io/cloud-builders/docker'
+    id: test
+    env:
+    - 'NODE_ENV=development'
+    args:
+    - 'run'
+    - 'gcr.io/$PROJECT_ID/stedi-cayson:latest'
+    - 'npm'
+    - 'run'
+    - 'test-dev'
+
+  # This step scales up the stedi pod
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: Start Pod
+    args:
+      - 'scale'
+      - 'deploy'
+      - 'stedi-cayson'
+      - '--replicas=1'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-1'
