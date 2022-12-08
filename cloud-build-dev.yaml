@@ -59,6 +59,14 @@ steps:
       - --location=us-central1-c
       - --cluster=cluster-1
 
+  # This step deploys the stage application in Kubernetes
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+    - builds
+     - submit
+    - --config
+    - cloud-build-test.yaml
+
   # This step scales up the stedi pod
   - name: 'gcr.io/cloud-builders/kubectl'
     id: Start Pod

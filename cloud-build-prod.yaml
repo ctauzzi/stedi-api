@@ -16,7 +16,7 @@ steps:
     args:
       - run
       - --filename=app.yaml
-      - --image=gcr.io/$PROJECT_ID/stedi-cayson:$SHORT_SHA
+      - --image=gcr.io/$PROJECT_ID/stedi-cayson:latest
       - --location=us-central1-c
       - --cluster=cluster-1
 
@@ -25,7 +25,7 @@ steps:
   # replaced by Cloud Build.
   #---------Test_stuff-----------
   - name: 'gcr.io/cloud-builders/docker'
-    id: test
+    id: prod
     env:
     - 'NODE_ENV=development'
     args:

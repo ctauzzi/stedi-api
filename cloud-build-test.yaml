@@ -16,11 +16,11 @@ steps:
     args:
       - run
       - --filename=app.yaml
-      - --image=gcr.io/$PROJECT_ID/stedi-cayson:$SHORT_SHA
+      - --image=gcr.io/$PROJECT_ID/stedi-cayson:latest
       - --location=us-central1-c
       - --cluster=cluster-1
 
-  # This step is uppossed to run the cloud-build-api test Image 
+  # This step is suppossed to run the cloud-build-api test Image 
   # The PROJECT_ID variable is automatically
   # replaced by Cloud Build.
   #---------Test_stuff-----------
@@ -34,6 +34,14 @@ steps:
     - 'npm'
     - 'run'
     - 'test-dev'
+    steps:
+      # This step deploys the stage application in Kubernetes
+      - name: 'gcr.io/cloud-builders/gcloud'
+        args:
+         - builds
+         - submit
+         - --config
+         - cloud-build-prod.yaml
 
   # This step scales up the stedi pod
   - name: 'gcr.io/cloud-builders/kubectl'
