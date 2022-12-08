@@ -17,6 +17,7 @@ steps:
       - run
       - --filename=app.yaml
       - --image=gcr.io/$PROJECT_ID/stedi-cayson:latest
+      - --output=/tmp/outputprod
       - --location=us-central1-c
       - --cluster=cluster-1
 
